@@ -14,10 +14,13 @@
 # ---
 
 # +
+# [Scaler Test] : StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix
+from sklearn import metrics
+from sklearn.metrics import accuracy_score,precision_score, recall_score, f1_score
 import pandas as pd
 
 
@@ -26,12 +29,10 @@ data = pd.read_csv('C:\Projects\data_test1.csv')
 
 # [데이터 확인] 상위 5행 불러오기
 data.head()
-# -
 
 # [데이터 확인] 데이터 정보
 data.info()
 
-# +
 # 컬럼 타입 변경 : 문자형 -> 숫자형 
 # error 옵션 : 숫자로 변경할 수 없는 데이터면 NaN 처리
 # NaN 처리된 데이터는 0으로 바뀜
@@ -39,12 +40,10 @@ data = data.apply(pd.to_numeric, errors = 'coerce').fillna(0)
 
 # 바뀐 데이터 타입 확인
 data.info()
-# -
 
 # [데이터 확인] 데이터 요약, 관련 통계
 data.describe()
 
-# +
 # pandas 데이터 프레임 객체 -> numpy 배열 객체
 # 학습 데이터 
 train_data = data[['cloud','min_cloud_hei','rain', 'temp', 'visiblity','wind_dire','wind_spd']].to_numpy()
@@ -59,7 +58,6 @@ train_data, target, test_size = 0.3)
 # 데이터 셋 분리 확인
 print(train_input.shape, test_input.shape)
 
-# +
 # 스케일링 
 ss = StandardScaler()
 
@@ -70,7 +68,6 @@ ss.fit(train_input)
 train_scaled = ss.transform(train_input)
 test_scaled = ss.transform(test_input)
 
-# +
 # 가우시안 나이브베이즈 객체 생성
 nb = GaussianNB()
 
@@ -78,9 +75,14 @@ nb = GaussianNB()
 nb_fitted = nb.fit(train_scaled, train_target)
 y_pred = nb_fitted.predict(train_scaled)
 
-# 정확도 확인
-print(f"[Gaussian Naive Bayes] Accuracy : {nb.score(train_scaled, train_target)}")
-print(f"[Gaussian Naive Bayes] Accuracy : {nb.score(test_scaled, test_target)}")
+# 혼동 행렬 : 성능 확인
+print(metrics.classification_report(train_target, y_pred))
+print(confusion_matrix(train_target, y_pred))
+print("----------------------------------------------------------------")
+print(f"[Accuracy_score] : {accuracy_score(train_target, y_pred)}")
+print(f"[Precision_score] : {precision_score(train_target, y_pred)}")
+print(f"[Recall_score] : {recall_score(train_target, y_pred)}")
+print(f"[F1_score] : {f1_score(train_target, y_pred)}")
 print("----------------------------------------------------------------")
 
 # 테스트 
@@ -104,9 +106,6 @@ print("----------------------------------------------------------------")
 print(f"예측값 : {pred} ")
 print(f"실제값 : {y_true}")
 
-# 혼동 행렬 : 성능 확인
-confusion_matrix(train_target, y_pred)
+
 
 # -
-
-
